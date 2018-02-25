@@ -17,7 +17,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         logger.info("Getting ready to poll Poloniex...")
-        schedule.every(1).minutes.do(pull_poloniex_data)
+        schedule.every(1).minutes.do(poll_latest_poloniex_data)
+
         keep_going=True
         while keep_going:
             try:
@@ -29,9 +30,9 @@ class Command(BaseCommand):
                 keep_going = False
 
 
-def pull_poloniex_data():
+def poll_latest_poloniex_data():
     try:
-        logger.info("pulling Poloniex data...")
+        logger.info("polling for Poloniex data...")
         req = get('https://poloniex.com/public?command=returnTicker')
 
         poloniex_data_point = ExchangeData.objects.create(
@@ -39,7 +40,7 @@ def pull_poloniex_data():
             data=req.json(), # the exact json from the request data
             timestamp=time.time() # now
         )
-        logger.info("Saving Poloniex price, volume data...")
+        logger.info("Saving Poloniex data...")
 
     except RequestException:
         return 'Error to collect data from Poloniex'
