@@ -64,8 +64,6 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = LOCAL or STAGE
 
-AUTH_USER_MODEL = 'user.User'
-
 WSGI_APPLICATION = 'settings.wsgi.application'
 
 SITE_BASE_URL = os.environ.get('SITE_BASE_URL')
