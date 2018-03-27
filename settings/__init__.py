@@ -125,11 +125,20 @@ STATICFILES_DIRS = (
 
 LOGIN_REDIRECT_URL = '/'
 
+# App settings
+EXCHANGE_MARKETS = ('poloniex', 'binance', 'hitbtc', 'kucoin')
+#EXCHANGE_MARKETS = ('poloniex', 'binance', 'bittrex', 'bitfinex')
+
 
 # General apps settings
 
 if PRODUCTION or STAGE:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+if LOCAL:
+    PUBLISH_MESSSAGES = False # Do not send messages to sns
+else:
+    PUBLISH_MESSSAGES = True
 
 logger.info("Importing vendor_services_settings")
 try:
@@ -146,7 +155,3 @@ if LOCAL:
     except:
         logger.error("Could not successfully import local_settings.py. This is necessary if you are running locally. This file should be in version control.")
         raise
-
-# App settings
-
-EXCHANGE_MARKETS = ('poloniex', 'binance', 'bittrex', 'bitfinex')
