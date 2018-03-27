@@ -15,30 +15,26 @@ from apps.channel.models import ExchangeData
 
 from settings import EXCHANGE_MARKETS, AWS_OPTIONS, AWS_SNS_TOPIC_ARN, PUBLISH_MESSSAGES, LOCAL
 
-logger = logging.getLogger(__name__)
 
+
+logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     help = "Fetch tickers every 1 minute"
 
     def handle(self, *args, **options):
         logger.info("Getting ready to fetch tickers from exchanges")
-        
-        if LOCAL: # FIXME Remove this local part later. Now it's just for debug.
-            fetch_and_process_all()
-        else:
-            schedule.every(1).minutes.do(fetch_and_process_all)
-            # FIXME choose better scheduling later
-            while True:
-                try:
-                    schedule.run_pending()
-                    time.sleep(1)
-                except Exception as e:
-                    logger.debug(str(e))
-                    logger.info("Fetching shut down.")
 
+        #fetch_and_process_all(); return
+        schedule.every(1).minutes.do(fetch_and_process_all)
+        while True:
+            try:
+                schedule.run_pending()
+                time.sleep(1)
+            except Exception as e:
+                logger.debug(str(e))
+                logger.info("Fetching shut down.")
 
-# FIXME Reorganize code later. Better variable/functions names
 
 def fetch_and_process_all():
     for exchange in EXCHANGE_MARKETS:
@@ -69,11 +65,11 @@ def process_tickers_to_standart_format(tickers, exchange_id):
     # ]
     symbols_info = list()
     #logger.debug(tickers)
-    for currency_pair, currency_info in tickers.items(): # DASH/BTC, BCH/USDT, REP/BTC
+    for currency_pair, currency_info in tickers.items(): # currency_pair: DASH/BTC, BCH/USDT, REP/BTC
         logger.debug(f'Currencies for {exchange_id}: {currency_pair}')
 
         if currency_pair.endswith('BTC') or currency_pair.endswith('USDT'): # filtering
-            print(f'currency_pair: {currency_pair}, info: {currency_info}')
+            logger.debug(f'currency_pair: {currency_pair}, info: {currency_info}')
             if 'last' in currency_info: # last_price
                 symbols_info.append(standard_format_item(
                     source=exchange_id, category='price',
