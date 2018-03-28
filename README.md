@@ -5,7 +5,9 @@
 
 1. Install Prerequisites
  - python3.5 
- - pip 
+ - pip
+ - [mysqlclient prerequisites](https://github.com/PyMySQL/mysqlclient-python#install) (`sudo apt-get install python-dev libmysqlclient-dev python3-dev`)
+ - if connecting to Postgres: `postgresql-server-dev-x.x` 
  - [virtualenv](https://virtualenv.pypa.io/en/stable/installation/) 
  - [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/install.html)
  - run commands to create virtual env
@@ -32,7 +34,7 @@
  
 4. Run Local Server
  - `$ python manage.py runserver`
- - open [http://localhost:8000/](http://localhost:8000/)
+ - open [http://localhost:8000/](http://localhost:8000/) (`127.0.0.1` does not work)
  - view logs and debug as needed
 
 5. Run Worker Services
