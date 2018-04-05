@@ -126,8 +126,20 @@ STATICFILES_DIRS = (
 LOGIN_REDIRECT_URL = '/'
 
 # App settings
-EXCHANGE_MARKETS = ('poloniex', 'binance', 'hitbtc', 'kucoin')
+EXCHANGE_MARKETS = ('poloniex', 'binance', 'hitbtc', 'kucoin', 'bittrex') # +cryptopia?
 #EXCHANGE_MARKETS = ('poloniex', 'binance', 'bittrex', 'bitfinex')
+
+USDT_COINS = 'BTC XRP ETH ETC STR BCH LTC XMR ZEC NXT REP DASH'.split()
+BTC_COINS = [
+    "XRP" , "ETH" , "ETC", "STR",  "XMR",  "BCH", "LTC", "XEM", "DOGE", "ZRX", "LSK", "DASH",
+    "DGB", "BTS", "SC", "ZEC", "STRAT", "BCN", "FCT", "GAME", "REP", "OMG", "VRC",
+    "NXT", "STEEM", "MAID", "STORJ", "GNT", "GAS", "AMP", "SYS", "EMC2",
+    "VTC", "BURST", "LBC", "GNO", "DCR", "FLO", "POT", "OMNI",
+    "CVC", "PASC", "ARDR", "BCY", "GRC", "CLAM", "XCP", "VIA",
+    "BTCD", "FLDC", "NAV", "NEOS", "PPC", "BLK", "EXP", "RIC",
+    "NXC", "BELA", "XPM", "XVC", "XBC", "RADS", "SBD", "PINK", "NMC", "HUC", "BTM"
+]
+ALL_COINS = USDT_COINS + list(set(BTC_COINS)-set(USDT_COINS)) # 68 coins
 
 
 # General apps settings
@@ -138,7 +150,7 @@ if PRODUCTION or STAGE:
 if LOCAL:
     PUBLISH_MESSSAGES = False # Do not send messages to sns
 else:
-    PUBLISH_MESSSAGES = True
+    PUBLISH_MESSSAGES = os.environ.get('PUBLISH_MESSSAGES', True)
 
 logger.info("Importing vendor_services_settings")
 try:
