@@ -33,15 +33,10 @@ if not LOCAL:
             'PORT': os.environ['RDS_PORT'],
         }
     }
-
-# AWS
-AWS_OPTIONS = {
-    'AWS_ACCESS_KEY_ID': os.environ.get('AWS_ACCESS_KEY_ID', ''),
-    'AWS_SECRET_ACCESS_KEY': os.environ.get('AWS_SECRET_ACCESS_KEY', ''),
-    'AWS_REGION': 'us-east-1',
-}
-
-if PRODUCTION:
-    AWS_SNS_TOPIC_ARN = 'arn:aws:sns:us-east-1:983584755688:itt-sns-data-core-production'
-else:
-    AWS_SNS_TOPIC_ARN = 'arn:aws:sns:us-east-1:983584755688:itt-sns-data-core-stage'
+    # AWS
+    AWS_OPTIONS = {
+        'AWS_ACCESS_KEY_ID': os.environ.get('AWS_ACCESS_KEY_ID', ''),
+        'AWS_SECRET_ACCESS_KEY': os.environ.get('AWS_SECRET_ACCESS_KEY', ''),
+        'AWS_REGION': 'us-east-1',
+    }
+    AWS_SNS_TOPIC_ARN = os.environ.get('AWS_SNS_TOPIC_ARN')
