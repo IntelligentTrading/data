@@ -16,7 +16,7 @@ from apps.channel.models import ExchangeData
 from apps.common.utilities.multithreading import start_new_thread
 
 from settings import EXCHANGE_MARKETS, AWS_OPTIONS, AWS_SNS_TOPIC_ARN, PUBLISH_MESSSAGES, LOCAL
-#from settings import ALL_COINS
+from settings import ALL_COINS
 
 
 
@@ -57,7 +57,7 @@ def fetch_and_process_one(exchange):
         save_to_db(tickers, exchange)
 
         symbols_info = process_tickers_to_standart_format(tickers, exchange)
-        publish_message_to_queue(symbols_info)
+        publish_message_to_queue(json.dumps(symbols_info))
 
 def fetch_tickers_from(exchange_id):
     # we use ccxt: https://github.com/ccxt/ccxt/tree/master/python
@@ -84,7 +84,7 @@ def process_tickers_to_standart_format(tickers, exchange_id):
     for symbol, symbol_info in tickers.items(): # symbol: DASH/BTC, BCH/USDT, REP/BTC
         #logger.debug(f'{symbol}')
         try:
-            (_, _) = symbol.split('/') # check format
+            (transaction_currency, counter_currency) = symbol.split('/') # check format
         except ValueError:
             logger.debug(f'Skipping symbol: {symbol}')
             continue # skip malformed currency pairs
@@ -93,7 +93,7 @@ def process_tickers_to_standart_format(tickers, exchange_id):
 #        if symbol.endswith('BTC') or symbol.endswith('USDT'): # filtering
 #       FIXME add some filtering?
 
-        if True: # process all currency pairs
+        if counter_currency in ('BTC', 'USDT', 'ETH') and transaction_currency in ALL_COINS: # filtering
             #logger.debug(f'+Adding: {symbol}')
             #logger.debug(f'symbol: {symbol}, info: {symbol_info}')
             count_added += 1
@@ -113,19 +113,34 @@ def process_tickers_to_standart_format(tickers, exchange_id):
     logger.info(f'>>> Processed: {len(tickers)}, Added: {count_added} items')
     return symbols_info
 
-def publish_message_to_queue(symbols_info):
-    logger.debug(f"Publish message: {len(symbols_info)} symbols, {sys.getsizeof(symbols_info)} bytes")
+
+def publish_message_to_queue(message, topic_arn=AWS_SNS_TOPIC_ARN):
+    logger.debug(f"Publish message, size: {len(message)}")
     if PUBLISH_MESSSAGES:
         sns = aws_resource('sns')
-        topic = sns.Topic(AWS_SNS_TOPIC_ARN)
+        topic = sns.Topic(topic_arn)
         response = topic.publish(
-            Message=json.dumps(symbols_info)
+            Message=message,
         )
         logger.debug(f">>> Messsage published with response: {response}")
     else:
         logger.debug(f'>>> Simulated publishing')
         response = None
     return response
+
+# def publish_message_to_queue(symbols_info):
+#     logger.debug(f"Publish message: {len(symbols_info)} symbols, {sys.getsizeof(symbols_info)} bytes")
+#     if PUBLISH_MESSSAGES:
+#         sns = aws_resource('sns')
+#         topic = sns.Topic(AWS_SNS_TOPIC_ARN)
+#         response = topic.publish(
+#             Message=json.dumps(symbols_info)
+#         )
+#         logger.debug(f">>> Messsage published with response: {response}")
+#     else:
+#         logger.debug(f'>>> Simulated publishing')
+#         response = None
+#     return response
 
 
 def save_to_db(tickers, exchange_id):
