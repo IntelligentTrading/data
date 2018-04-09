@@ -16,7 +16,7 @@ from apps.channel.models import ExchangeData
 from apps.common.utilities.multithreading import start_new_thread
 
 from settings import EXCHANGE_MARKETS, AWS_OPTIONS, AWS_SNS_TOPIC_ARN, PUBLISH_MESSSAGES, LOCAL
-from settings import ALL_COINS
+#from settings import ALL_COINS
 
 
 
@@ -31,7 +31,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         logger.info(f'>>> Getting ready to fetch tickers from: {", ".join(EXCHANGE_MARKETS)}')
 
-        #fetch_and_process_all(); return # one iteration for debug only
+        USDT_RATE = get_usd_price_for('BTC', 'ETH')
+
+        fetch_and_process_all(); return # one iteration for debug only
         
         schedule.every(1).minutes.do(fetch_and_process_all)
         while True:
@@ -45,19 +47,20 @@ class Command(BaseCommand):
 
 def fetch_and_process_all():
     for exchange in EXCHANGE_MARKETS:
-        #fetch_and_process_one(exchange)
+        fetch_and_process_one(exchange)
         logger.debug(f'Starting thread with fetch_and_process_one({exchange})')
         threading.Thread(target=fetch_and_process_one, args=(exchange,)).start()
     
     logger.info('\n>>> Waiting for next call of fetch_and_process_all')
 
 def fetch_and_process_one(exchange):
-        tickers = fetch_tickers_from(exchange)
+    tickers = fetch_tickers_from(exchange)
 
-        save_to_db(tickers, exchange)
+    save_to_db(tickers, exchange)
+    
+    symbols_info = process_tickers_to_standart_format(tickers, exchange)
+    publish_message_to_queue(json.dumps(symbols_info))
 
-        symbols_info = process_tickers_to_standart_format(tickers, exchange)
-        publish_message_to_queue(json.dumps(symbols_info))
 
 def fetch_tickers_from(exchange_id):
     # we use ccxt: https://github.com/ccxt/ccxt/tree/master/python
@@ -93,11 +96,9 @@ def process_tickers_to_standart_format(tickers, exchange_id):
 #        if symbol.endswith('BTC') or symbol.endswith('USDT'): # filtering
 #       FIXME add some filtering?
 
-        if counter_currency in ('BTC', 'USDT', 'ETH') and transaction_currency in ALL_COINS: # filtering
+        if counter_currency in ('BTC', 'USDT', 'ETH') and enough_volume(symbol_info): # filtering
             #logger.debug(f'+Adding: {symbol}')
-            #logger.debug(f'symbol: {symbol}, info: {symbol_info}')
             count_added += 1
-            
             if 'last' in symbol_info: # last_price
                 symbols_info.append(standard_format_item(
                     source=exchange_id, category='price',
@@ -108,11 +109,16 @@ def process_tickers_to_standart_format(tickers, exchange_id):
                     source=exchange_id, category='volume',
                     value=symbol_info['quoteVolume'],
                     symbol_info=symbol_info))
+        # else:
+        #     logger.debug(f'>> Filtered: {symbol}\n>>Info symbol_info')
 
     #logger.debug(f'Symbols info: {symbols_info}')
     logger.info(f'>>> Processed: {len(tickers)}, Added: {count_added} items')
     return symbols_info
 
+def enough_volume(symbol_info):
+    #print(f">>> Quote Volume: {symbol_info['quoteVolume']}")
+    return True
 
 def publish_message_to_queue(message, topic_arn=AWS_SNS_TOPIC_ARN):
     logger.debug(f"Publish message, size: {len(message)}")
@@ -169,3 +175,11 @@ def aws_resource(resource_type):
         aws_secret_access_key=AWS_OPTIONS['AWS_SECRET_ACCESS_KEY'],
         region_name=AWS_OPTIONS['AWS_REGION'],
     )
+
+def get_usd_price_for(*coins):
+    usdt_rate = {}
+    ccap = ccxt.coinmarketcap()
+    ccap.load_markets()
+    for coin in coins:
+        usdt_rate[coin] = float(ccap.market(f'{coin}/USD')['info']['price_usd']) #ccap.fetch_ticker(f'{coin}/USD')['close']
+    return usdt_rate

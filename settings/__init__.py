@@ -125,20 +125,8 @@ STATICFILES_DIRS = (
 
 LOGIN_REDIRECT_URL = '/'
 
-# App settings
-USDT_COINS = 'BTC XRP ETH ETC STR BCH LTC XMR ZEC NXT REP DASH'.split()
-BTC_COINS = [
-    "XRP" , "ETH" , "ETC", "STR",  "XMR",  "BCH", "LTC", "XEM", "DOGE", "ZRX", "LSK", "DASH",
-    "DGB", "BTS", "SC", "ZEC", "STRAT", "BCN", "FCT", "GAME", "REP", "OMG", "VRC",
-    "NXT", "STEEM", "MAID", "STORJ", "GNT", "GAS", "AMP", "SYS", "EMC2",
-    "VTC", "BURST", "LBC", "GNO", "DCR", "FLO", "POT", "OMNI",
-    "CVC", "PASC", "ARDR", "BCY", "GRC", "CLAM", "XCP", "VIA",
-    "BTCD", "FLDC", "NAV", "NEOS", "PPC", "BLK", "EXP", "RIC",
-    "NXC", "BELA", "XPM", "XVC", "XBC", "RADS", "SBD", "PINK", "NMC", "HUC", "BTM"
-]
-# combine and remove dublicates, USDT_COINS first in list
-ALL_COINS = USDT_COINS + list(set(BTC_COINS)-set(USDT_COINS))
 
+# App setting
 EXCHANGE_MARKETS = ('poloniex', 'binance', 'bittrex', 'bitfinex', 'kucoin') # 'gdax') # gdax API does not allow to fetch all tickers at once with a single call to fetch_tickers() for now
 EXCHANGE_MARKETS = ('poloniex',) # just test poloniex first, FIXME remove it
 
