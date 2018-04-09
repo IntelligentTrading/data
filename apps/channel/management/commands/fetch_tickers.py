@@ -33,7 +33,7 @@ class Command(BaseCommand):
 
         USDT_RATE = get_usd_price_for('BTC', 'ETH')
 
-        fetch_and_process_all(); return # one iteration for debug only
+        #fetch_and_process_all(); return # one iteration for debug only
         
         schedule.every(1).minutes.do(fetch_and_process_all)
         while True:
