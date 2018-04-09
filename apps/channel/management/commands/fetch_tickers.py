@@ -22,7 +22,10 @@ from settings import EXCHANGE_MARKETS, AWS_OPTIONS, AWS_SNS_TOPIC_ARN, PUBLISH_M
 
 logger = logging.getLogger(__name__)
 
+# too noisy
 logging.getLogger("ccxt.base.exchange").setLevel(logging.INFO)
+logging.getLogger("botocore.endpoint").setLevel(logging.INFO)
+logging.getLogger("boto3.resources.action").setLevel(logging.INFO)
 
 
 class Command(BaseCommand):
@@ -39,7 +42,7 @@ class Command(BaseCommand):
         while True:
             try:
                 schedule.run_pending()
-                time.sleep(1)
+                time.sleep(10)
             except Exception as e:
                 logger.debug(str(e))
                 logger.info(">>> Fetching shut down.")
@@ -47,9 +50,9 @@ class Command(BaseCommand):
 
 def fetch_and_process_all():
     for exchange in EXCHANGE_MARKETS:
-        fetch_and_process_one(exchange)
         logger.debug(f'Starting thread with fetch_and_process_one({exchange})')
-        threading.Thread(target=fetch_and_process_one, args=(exchange,)).start()
+        fetch_and_process_one(exchange)
+        #threading.Thread(target=fetch_and_process_one, args=(exchange,)).start()
     
     logger.info('\n>>> Waiting for next call of fetch_and_process_all')
 
@@ -92,12 +95,14 @@ def process_tickers_to_standart_format(tickers, exchange_id):
             logger.debug(f'Skipping symbol: {symbol}')
             continue # skip malformed currency pairs
 
-#        if (transaction_currency in ALL_COINS) and (counter_currency in ('BTC', 'USDT', 'ETH')):
-#        if symbol.endswith('BTC') or symbol.endswith('USDT'): # filtering
-#       FIXME add some filtering?
 
+        # FIXME add filtering by volume
         if counter_currency in ('BTC', 'USDT', 'ETH') and enough_volume(symbol_info): # filtering
-            #logger.debug(f'+Adding: {symbol}')
+            # For debug
+            if transaction_currency in ('BTC', 'ETH', 'DASH'):
+                logger.debug(f'+Adding {symbol}\nInfo: {symbol_info}')
+            # For debug end
+
             count_added += 1
             if 'last' in symbol_info: # last_price
                 symbols_info.append(standard_format_item(
@@ -128,26 +133,11 @@ def publish_message_to_queue(message, topic_arn=AWS_SNS_TOPIC_ARN):
         response = topic.publish(
             Message=message,
         )
-        logger.debug(f">>> Messsage published with response: {response}")
+        #logger.debug(f">>> Messsage published with response: {response}")
     else:
         logger.debug(f'>>> Simulated publishing')
         response = None
     return response
-
-# def publish_message_to_queue(symbols_info):
-#     logger.debug(f"Publish message: {len(symbols_info)} symbols, {sys.getsizeof(symbols_info)} bytes")
-#     if PUBLISH_MESSSAGES:
-#         sns = aws_resource('sns')
-#         topic = sns.Topic(AWS_SNS_TOPIC_ARN)
-#         response = topic.publish(
-#             Message=json.dumps(symbols_info)
-#         )
-#         logger.debug(f">>> Messsage published with response: {response}")
-#     else:
-#         logger.debug(f'>>> Simulated publishing')
-#         response = None
-#     return response
-
 
 def save_to_db(tickers, exchange_id):
     timestamp = tickers[list(tickers)[0]]['timestamp']/1000 # convert from timestamp in miliseconds
