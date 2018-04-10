@@ -128,7 +128,7 @@ LOGIN_REDIRECT_URL = '/'
 
 # App setting
 EXCHANGE_MARKETS = ('poloniex', 'binance', 'bittrex', 'bitfinex', 'kucoin') # 'gdax') # gdax API does not allow to fetch all tickers at once with a single call to fetch_tickers() for now
-EXCHANGE_MARKETS = ('poloniex',) # just test poloniex first, FIXME remove it
+EXCHANGE_MARKETS = ('poloniex', 'bittrex') # just test this first, FIXME remove it
 
 
 # General apps settings

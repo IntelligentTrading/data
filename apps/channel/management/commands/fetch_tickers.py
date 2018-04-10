@@ -62,7 +62,7 @@ def fetch_and_process_one(exchange):
     save_to_db(tickers, exchange)
     
     symbols_info = process_tickers_to_standart_format(tickers, exchange)
-    publish_message_to_queue(json.dumps(symbols_info))
+    publish_message_to_queue(message=json.dumps(symbols_info), topic_arn=AWS_SNS_TOPIC_ARN)
 
 
 def fetch_tickers_from(exchange_id):
@@ -100,7 +100,7 @@ def process_tickers_to_standart_format(tickers, exchange_id):
         if counter_currency in ('BTC', 'USDT', 'ETH') and enough_volume(symbol_info): # filtering
             # For debug
             if transaction_currency in ('BTC', 'ETH', 'DASH'):
-                logger.debug(f'+Adding {symbol}\nInfo: {symbol_info}')
+                logger.debug(f'+Adding {symbol} (testing coins from this list: BTC,ETH,DASH)\nInfo: {symbol_info}')
             # For debug end
 
             count_added += 1
@@ -125,7 +125,7 @@ def enough_volume(symbol_info):
     #print(f">>> Quote Volume: {symbol_info['quoteVolume']}")
     return True
 
-def publish_message_to_queue(message, topic_arn=AWS_SNS_TOPIC_ARN):
+def publish_message_to_queue(message, topic_arn):
     logger.debug(f"Publish message, size: {len(message)}")
     if PUBLISH_MESSSAGES:
         sns = aws_resource('sns')
@@ -135,7 +135,7 @@ def publish_message_to_queue(message, topic_arn=AWS_SNS_TOPIC_ARN):
         )
         #logger.debug(f">>> Messsage published with response: {response}")
     else:
-        logger.debug(f'>>> Simulated publishing')
+        logger.debug(f'>>> Simulating publishing')
         response = None
     return response
 
