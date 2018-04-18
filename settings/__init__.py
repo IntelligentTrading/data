@@ -127,8 +127,7 @@ LOGIN_REDIRECT_URL = '/'
 
 
 # App setting
-#EXCHANGE_MARKETS = ('poloniex', 'binance', 'bittrex', 'bitfinex', 'kucoin') # 'gdax') # gdax API does not allow to fetch all tickers at once with a single call to fetch_tickers() for now
-EXCHANGE_MARKETS = ('poloniex', 'bittrex', 'binance') # just test this first, FIXME remove it
+EXCHANGE_MARKETS = ('poloniex', 'binance', 'bittrex') #, 'bitfinex', 'kucoin') # 'gdax') # gdax API does not allow to fetch all tickers at once with a single call to fetch_tickers() for now
 TICKERS_MINIMUM_USD_VOLUME = 5000
 
 # General apps settings
@@ -136,10 +135,9 @@ if PRODUCTION or STAGE:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 if LOCAL:
-    PUBLISH_MESSSAGES = False # Do not send messages to sns
+    PUBLISH_MESSSAGES = False # Do not send messages to sns in local environment
 else:
     PUBLISH_MESSSAGES = os.environ.get("PUBLISH_MESSSAGES", "true").lower() == "true" # env variables are strings, not boolean
-#    PUBLISH_MESSSAGES = os.environ.get('PUBLISH_MESSSAGES', True)
 
 logger.info("Importing vendor_services_settings")
 try:

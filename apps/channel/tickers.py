@@ -23,6 +23,18 @@ class Tickers:
             self._fetch_from_exchange()
         self._process_tickers_to_standart_format()
 
+    def tickers_has_symbol(self, symbol):
+        try:
+            return symbol in self.tickers.keys()
+        except:
+            return False
+
+    def symbols_info_has_symbol(self, symbol, category='price'):
+        try:
+            return bool([item for item in self.symbols_info if item['symbol'] == symbol and item['category'] == category])
+        except:
+            return False
+
     def _fetch_from_exchange(self):
         ccxt_exchange = getattr(ccxt, self.exchange)()
         self.tickers = ccxt_exchange.fetch_tickers()
@@ -81,10 +93,13 @@ class Tickers:
 
     @classmethod
     def _symbol_allowed(cls, symbol_info, usdt_rates=None, minimum_volume_in_usd=None):
-        (_, counter_currency) = symbol_info['symbol'].split('/')
+        (transaction_currency, counter_currency) = symbol_info['symbol'].split('/')
+
         if counter_currency not in ('BTC', 'USDT', 'ETH'):
             return False
-        if None in (minimum_volume_in_usd, usdt_rates):
+        elif len(transaction_currency) >= 6: # Filter out Bitmark from Poloniex
+            return False
+        elif None in (minimum_volume_in_usd, usdt_rates):
             return True
 
         quote_volume_in_usdt = symbol_info['quoteVolume']*usdt_rates[counter_currency]

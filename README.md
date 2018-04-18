@@ -4,7 +4,7 @@
 ## Environment Setup
 
 1. Install Prerequisites
- - python3.5 
+ - python3.6
  - pip
  - [mysqlclient prerequisites](https://github.com/PyMySQL/mysqlclient-python#install) (`sudo apt-get install python-dev libmysqlclient-dev python3-dev`)
  - if connecting to Postgres: `postgresql-server-dev-x.x` 
