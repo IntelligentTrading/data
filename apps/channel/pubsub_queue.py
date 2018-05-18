@@ -2,7 +2,8 @@ import logging
 
 import boto3
 
-from settings import AWS_OPTIONS, PUBLISH_MESSSAGES
+from apps.channel.aws import aws_resource
+from settings import PUBLISH_MESSSAGES
 
 
 
@@ -29,11 +30,3 @@ def publish_message_to_queue(message, topic_arn):
     return response
 
 
-
-def aws_resource(resource_type):
-    return boto3.resource(
-        resource_type,
-        aws_access_key_id=AWS_OPTIONS['AWS_ACCESS_KEY_ID'],
-        aws_secret_access_key=AWS_OPTIONS['AWS_SECRET_ACCESS_KEY'],
-        region_name=AWS_OPTIONS['AWS_REGION'],
-    )
