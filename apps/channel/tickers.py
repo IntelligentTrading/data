@@ -78,10 +78,10 @@ class Tickers:
                         source=self.exchange, category='price',
                         value=symbol_info['last'],
                         symbol_info=symbol_info))
-                if 'quoteVolume' in symbol_info: # quote_volume, mean volume in counter_currrency
+                if 'baseVolume' in symbol_info: # base volume, mean volume in transaction currency
                     symbols_info.append(standard_format_item(
                         source=self.exchange, category='volume',
-                        value=symbol_info['quoteVolume'],
+                        value=symbol_info['baseVolume'],
                         symbol_info=symbol_info))
             else:
                 logger.debug(f'>> Filtered from {self.exchange}: {symbol}')
@@ -91,8 +91,8 @@ class Tickers:
         self.symbols_info = symbols_info
         return self.symbols_info
 
-    @classmethod
-    def _symbol_allowed(cls, symbol_info, usdt_rates=None, minimum_volume_in_usd=None):
+    @staticmethod
+    def _symbol_allowed(symbol_info, usdt_rates=None, minimum_volume_in_usd=None):
         (transaction_currency, counter_currency) = symbol_info['symbol'].split('/')
 
         if counter_currency not in ('BTC', 'USDT', 'ETH'):
@@ -110,6 +110,9 @@ class Tickers:
 
 
 ## Helpers
+def to_satoshi_int(float_value):
+    return int(float(float_value) * 10 ** 8)
+
 def get_usdt_rates_for(*coins):
     """
     Get usdt price from coinmarket for coins: BTC, USDT, ETH 
