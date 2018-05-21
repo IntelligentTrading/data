@@ -111,7 +111,10 @@ class Tickers:
 
 ## Helpers
 def to_satoshi_int(float_value):
-    return int(float(float_value) * 10 ** 8)
+    try:
+        return int(float(float_value) * 10 ** 8)
+    except:
+        return None
 
 def get_usdt_rates_for(*coins):
     """

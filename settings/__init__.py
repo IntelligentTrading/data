@@ -130,6 +130,29 @@ LOGIN_REDIRECT_URL = '/'
 EXCHANGE_MARKETS = ('poloniex', 'binance', 'bittrex') #, 'bitfinex', 'kucoin') # 'gdax') # gdax API does not allow to fetch all tickers at once with a single call to fetch_tickers() for now
 TICKERS_MINIMUM_USD_VOLUME = 5000
 
+(POLONIEX, BITTREX, BINANCE, BITFINEX, KUCOIN, GDAX, HITBTC) = list(range(7))
+SOURCE_CHOICES = (
+    (POLONIEX, 'poloniex'),
+    (BITTREX, 'bittrex'),
+    (BINANCE, 'binance'),
+    (BITFINEX, 'bitfinex'),
+    (KUCOIN, 'kucoin'),
+    (GDAX, 'gdax'),
+    (HITBTC, 'hitbtc'),
+)
+
+# list of supported counter currencies.
+# We save to history trading pairs only with these counter currencies 
+COUNTER_CURRENCIES = ('BTC', 'ETH', 'USDT')
+
+(BTC, ETH, USDT, XMR) = list(range(4))
+COUNTER_CURRENCY_CHOICES = (
+    (BTC, 'BTC'),
+    (ETH, 'ETH'),
+    (USDT, 'USDT'),
+    (XMR, 'XMR'),
+)
+
 # General apps settings
 if PRODUCTION or STAGE:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
