@@ -25,7 +25,6 @@ BITTREX_TICKERS = {'2GIVE/XXX': {'symbol': '2GIVE/XXX', 'timestamp': 15234583230
 class TestHistoryDB(TestCase):
     def test_save_to_history(self):
         save_to_history(exchange = 'poloniex', tickers=POLONIEX_TICKERS)
-        last_ticker_info = POLONIEX_TICKERS
         h = HistoryPrice.objects.first()
         #{'symbol': 'BCN/BTC', 'timestamp': 1523439353595, 'datetime': '2018-04-11T09:35:54.595Z', 'high': 3.8e-07, 'low': 3.2e-07, 'bid': 3.4e-07, 'bidVolume': None, 'ask': 3.5e-07, 'askVolume': None, 'vwap': None, 'open': 3.1999999999999995e-07, 'close': 3.4e-07, 'last': 3.4e-07, 'previousClose': None, 'change': 2.000000000000002e-08, 'percentage': 6.25, 'average': 3.2999999999999996e-07, 'baseVolume': 146970152.54629916, 'quoteVolume': 51.17040999, 'info': {'id': 7, 'last': '0.00000034', 'lowestAsk': '0.00000035', 'highestBid': '0.00000034', 'percentChange': '0.06250000', 'baseVolume': '51.17040999', 'quoteVolume': '146970152.54629916', 'isFrozen': '0', 'high24hr': '0.00000038', 'low24hr': '0.00000032'}
         self.assertEqual(h.timestamp.timestamp(), 1523439353.595)
