@@ -1,5 +1,3 @@
-import logging
-
 from django.db import models
 from unixtimestampfield.fields import UnixTimeStampField
 
@@ -7,11 +5,10 @@ from settings import SOURCE_CHOICES, COUNTER_CURRENCY_CHOICES
 
 
 
-logger = logging.getLogger(__name__)
-
 class HistoryPrice(models.Model):
-#     # all prices in satochi integer units, divide it by 10^8 to get real values
-#     # timestamp, open, high, low, close, volume
+    # all prices in satochi integer units, divide it by 10^8 to get real values
+    # timestamp, open, high, low, close, volume
+
     timestamp = UnixTimeStampField(null=False)                              # UTC timestamp
     source = models.SmallIntegerField(choices=SOURCE_CHOICES, null=False)   # required, exchange code
     transaction_currency = models.CharField(max_length=8, null=False)       # required, base currency in trading pair

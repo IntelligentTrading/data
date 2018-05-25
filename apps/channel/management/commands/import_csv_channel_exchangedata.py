@@ -5,7 +5,7 @@ import csv
 import ast
 # import re
 # import io
-# #import time
+import time
 
 # import boto3
 # import pandas as pd
@@ -30,6 +30,7 @@ from settings import BASE_DIR, COUNTER_CURRENCY_CHOICES, COUNTER_CURRENCIES
 
 
 
+
 logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
@@ -48,22 +49,24 @@ class Command(BaseCommand):
 
 
 def import_db_data_channel_exchangedata():
+    start_time = time.time()
     logger.info(f"Starting reading data from Data App")
-    records = ExchangeData.objects.order_by('timestamp')
-    #print(record.__dict__) 
+    records = ExchangeData.objects.order_by('timestamp').iterator()
+    #print(record.__dict__)
     #source_txt = record.source
     #print(source_txt)
 
-    
-    for record in records.iterator():
+    j = 0
+    for record in records:
         source = source_code_from_name(record.source)
         print("ID:", record.id, "Source:", source)
         for coin, coin_value in record.data.items():
-            print(coin, len(coin_value))
+            print(f"record: {record.id}, counter: {j}, coin: {coin}")
+            j += 1
             try:
                 transaction_currency, counter_currency_txt  = coin.split("/")
             except: # skip
-                continue 
+                continue
             #print(f"coin:{coin} tc:{transaction_currency} cc:{counter_currency_txt}")
             if counter_currency_txt not in COUNTER_CURRENCIES:
                 print("Skipping:", coin)
@@ -75,7 +78,7 @@ def import_db_data_channel_exchangedata():
 
             print(coin_value)
             # Dry run
-            print(f"""
+            res = f"""
             HistoryPrice.objects.create(
                 timestamp = {timestamp},
                 source = {source},
@@ -87,7 +90,7 @@ def import_db_data_channel_exchangedata():
                 close_price = {to_satoshi_int(coin_value['close'])},
                 base_volume = {coin_value['baseVolume']},
                 extra = 2,
-            """)
+            """
 
 
         #counter_currency_code = next((code for code, cc_text in COUNTER_CURRENCY_CHOICES if counter_text==cc_text), None)
@@ -110,7 +113,7 @@ def import_core_channel_exchangedata(filename):
     iter_rows = iter(getrow(filename))
     print(f"Columns:{next(iter_rows)}")  # Skipping the column names
     for idx, row in enumerate(iter_rows):
-        (id,source,data,timestamp_str) = row
+        (_, source, data, timestamp_str) = row
         timestamp = float(timestamp_str)
         data_dict = ast.literal_eval(data)
         i = 0
