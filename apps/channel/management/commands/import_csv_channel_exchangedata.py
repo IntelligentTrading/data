@@ -49,7 +49,7 @@ class Command(BaseCommand):
 
 
 def import_db_data_channel_exchangedata():
-    start_time = time.time()
+    #start_time = time.time()
     logger.info(f"Starting reading data from Data App")
     records = ExchangeData.objects.order_by('timestamp').iterator()
     #print(record.__dict__)
@@ -78,7 +78,7 @@ def import_db_data_channel_exchangedata():
 
             print(coin_value)
             # Dry run
-            res = f"""
+            f"""
             HistoryPrice.objects.create(
                 timestamp = {timestamp},
                 source = {source},

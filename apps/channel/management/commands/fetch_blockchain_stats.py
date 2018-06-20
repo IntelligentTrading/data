@@ -3,9 +3,7 @@
 # Docs: https://blockchain.info/api/charts_api
 import logging
 import time
-from datetime import datetime
 
-import json
 import requests
 import schedule
 
