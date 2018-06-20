@@ -35,7 +35,7 @@ class Command(BaseCommand):
         usdt_rates = get_usdt_rates_for('BTC', 'ETH')
 
         #fetch_and_process_all_exchanges(usdt_rates); return # one iteration for debug only
-        
+
         schedule.every(1).minutes.do(fetch_and_process_all_exchanges, usdt_rates)
 
         keep_going = True
