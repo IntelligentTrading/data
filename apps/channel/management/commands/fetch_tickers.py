@@ -65,7 +65,7 @@ def fetch_and_process_one(exchange, usdt_rates):
     save_to_db(tickers.tickers, exchange)
 
     # send message with prices/volumes to Core app
-    publish_message_to_queue(message=json.dumps(tickers.symbols_info), topic_arn=AWS_SNS_TOPIC_ARN)
+    publish_message_to_queue(message=json.dumps(tickers.symbols_info), topic_arn=AWS_SNS_TOPIC_ARN, subject='prices_volumes')
 
     # store price/volume data into HistoryPrice model
     save_to_history(tickers.tickers, exchange)

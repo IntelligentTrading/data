@@ -15,18 +15,17 @@ logging.getLogger("boto3").setLevel(logging.INFO)
 logging.getLogger("botocore").setLevel(logging.INFO)
 
 
-def publish_message_to_queue(message, topic_arn):
+def publish_message_to_queue(message, topic_arn, subject=''):
     logger.debug(f"Publish message, size: {len(message)}")
     if PUBLISH_MESSSAGES:
         sns = aws_resource('sns')
         topic = sns.Topic(topic_arn)
         response = topic.publish(
             Message=message,
+            Subject=subject,
         )
-        logger.debug(f">>> Messsage published with response: {response}")
+        logger.debug(f">>> Messsage {subject} published with response: {response}")
     else:
-        logger.debug(f'>>> Simulating publishing')
+        logger.debug(f'>>> Simulating publishing {subject}')
         response = None
     return response
-
-
