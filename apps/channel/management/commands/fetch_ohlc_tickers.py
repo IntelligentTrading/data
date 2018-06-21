@@ -1,6 +1,5 @@
 import json
 import logging
-import sys
 import time
 import threading
 
@@ -9,14 +8,9 @@ import schedule
 import ccxt
 
 from django.core.management.base import BaseCommand
-#from requests import get, RequestException
-
-from apps.channel.models import ExchangeData
-from apps.channel.models import HistoryPrice
 
 from apps.channel.tickers import Tickers, get_usdt_rates_for, to_satoshi_int
 from apps.channel.pubsub_queue import publish_message_to_queue
-#from apps.common.utilities.multithreading import start_new_thread
 
 from settings import EXCHANGE_MARKETS, AWS_SNS_TOPIC_ARN, SNS_PRICES_BATCH_SIZE
 from settings import TICKERS_MINIMUM_USD_VOLUME
