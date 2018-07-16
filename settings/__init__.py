@@ -178,5 +178,3 @@ if LOCAL:
     except:
         logger.error("Could not successfully import local_settings.py. This is necessary if you are running locally. This file should be in version control.")
         raise
-
-PUBLISH_HISTORY = True
