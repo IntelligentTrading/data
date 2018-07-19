@@ -54,7 +54,8 @@ def fetch_and_process_one(exchange, usdt_rates):
     tickers = Tickers(exchange=exchange, usdt_rates=usdt_rates, minimum_volume_in_usd=TICKERS_MINIMUM_USD_VOLUME)
     tickers.run()
 
-    send_ohlc_data_to_queue(tickers)
+    # send_ohlc_data_to_queue(tickers)
+    send_ohlc_data_to_api(tickers)
 
 
 def send_ohlc_data_to_queue(tickers_object, batch_size = SNS_PRICES_BATCH_SIZE):
@@ -87,3 +88,29 @@ def send_ohlc_data_to_queue(tickers_object, batch_size = SNS_PRICES_BATCH_SIZE):
         message_value_batch = message_value[i:i+batch_size]
         #print(f"batch_{i}> size:{len(message_value_batch)}")
         publish_message_to_queue(message=json.dumps(message_value_batch), topic_arn=AWS_SNS_TOPIC_ARN, subject="ohlc_prices")
+
+
+import requests
+def send_ohlc_data_to_api(tickers_object):
+    for symbol, symbol_info in tickers_object.tickers.items():
+
+        if not symbol.count('/') == 1: # check format is like "ETH/BTC"
+            logger.debug(f'Skipping symbol: {symbol}')
+            continue # skip malformed currency pairs
+
+        if tickers_object._symbol_allowed(symbol_info=symbol_info,
+                                          usdt_rates=tickers_object.usdt_rates,
+                                          minimum_volume_in_usd=tickers_object.minimum_volume_in_usd):
+
+            r = requests.put(f'http://127.0.0.1:5000/api/resampled/{symbol.replace("/","_")}', data={
+                'exchange': tickers_object.exchange,
+                'ticker': symbol_info['symbol'],
+                'timestamp': int(symbol_info['timestamp']/1000), # timestamp in miliseconds,
+                'open_price': symbol_info['open'],
+                'high_price': symbol_info['high'],
+                'low_price': symbol_info['low'],
+                'close_price': symbol_info['close'],
+                'close_volume': symbol_info['baseVolume'],
+            })
+            logger.debug(r.url)
+            logger.debug(r.text)
