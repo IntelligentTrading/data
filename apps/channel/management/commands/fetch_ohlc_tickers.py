@@ -12,7 +12,7 @@ from django.core.management.base import BaseCommand
 from apps.channel.tickers import Tickers, get_usdt_rates_for, to_satoshi_int
 from apps.channel.pubsub_queue import publish_message_to_queue
 
-from settings import EXCHANGE_MARKETS, AWS_SNS_TOPIC_ARN, SNS_PRICES_BATCH_SIZE
+from settings import EXCHANGE_MARKETS, AWS_SNS_TOPIC_ARN, SNS_PRICES_BATCH_SIZE, TA_API
 from settings import TICKERS_MINIMUM_USD_VOLUME
 from settings import SOURCE_CHOICES, COUNTER_CURRENCY_CHOICES, COUNTER_CURRENCIES
 
@@ -31,6 +31,7 @@ class Command(BaseCommand):
         #fetch_and_process_all_exchanges(usdt_rates); return # one iteration for debug only
 
         schedule.every(1).minutes.do(fetch_and_process_all_exchanges, usdt_rates)
+        fetch_and_process_all_exchanges(usdt_rates) # and go now too!
 
         keep_going = True
         while keep_going:
@@ -54,7 +55,7 @@ def fetch_and_process_one(exchange, usdt_rates):
     tickers = Tickers(exchange=exchange, usdt_rates=usdt_rates, minimum_volume_in_usd=TICKERS_MINIMUM_USD_VOLUME)
     tickers.run()
 
-    # send_ohlc_data_to_queue(tickers)
+    send_ohlc_data_to_queue(tickers)
     send_ohlc_data_to_api(tickers)
 
 
@@ -102,15 +103,18 @@ def send_ohlc_data_to_api(tickers_object):
                                           usdt_rates=tickers_object.usdt_rates,
                                           minimum_volume_in_usd=tickers_object.minimum_volume_in_usd):
 
-            r = requests.put(f'http://127.0.0.1:5000/api/resampled/{symbol.replace("/","_")}', data={
-                'exchange': tickers_object.exchange,
-                'ticker': symbol_info['symbol'],
-                'timestamp': int(symbol_info['timestamp']/1000), # timestamp in miliseconds,
-                'open_price': symbol_info['open'],
-                'high_price': symbol_info['high'],
-                'low_price': symbol_info['low'],
-                'close_price': symbol_info['close'],
-                'close_volume': symbol_info['baseVolume'],
-            })
+            ticker = symbol.replace("/","_")
+            r = requests.put(f'{TA_API}/historical_data/{ticker}',
+                             json={
+                                 'exchange': tickers_object.exchange,
+                                 'ticker': symbol_info['symbol'],
+                                 'timestamp': int(symbol_info['timestamp'] / 1000),  # milliseconds -> sec
+                                 'open_price': symbol_info['open'],
+                                 'high_price': symbol_info['high'],
+                                 'low_price': symbol_info['low'],
+                                 'close_price': symbol_info['close'],
+                                 'close_volume': symbol_info['baseVolume'],
+                             })
+
             logger.debug(r.url)
-            logger.debug(r.text)
+            logger.debug(r.json())

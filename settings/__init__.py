@@ -178,3 +178,10 @@ if LOCAL:
     except:
         logger.error("Could not successfully import local_settings.py. This is necessary if you are running locally. This file should be in version control.")
         raise
+
+if PRODUCTION:
+    TA_API = "http://itt-core-production.herokuapp.com/api/v3"
+elif STAGE:
+    TA_API = "http://itt-core-stage.herokuapp.com/api/v3"
+else: #LOCAL
+    TA_API = "http://127.0.0.1:8000/api/v3"
