@@ -12,7 +12,7 @@ from django.core.management.base import BaseCommand
 from apps.channel.tickers import Tickers, get_usdt_rates_for, to_satoshi_int
 from apps.channel.pubsub_queue import publish_message_to_queue
 
-from settings import EXCHANGE_MARKETS, AWS_SNS_TOPIC_ARN, SNS_PRICES_BATCH_SIZE, TA_API
+from settings import EXCHANGE_MARKETS, AWS_SNS_TOPIC_ARN, SNS_PRICES_BATCH_SIZE, ITF_API, ITF_API_KEY
 from settings import TICKERS_MINIMUM_USD_VOLUME
 from settings import SOURCE_CHOICES, COUNTER_CURRENCY_CHOICES, COUNTER_CURRENCIES
 
@@ -104,7 +104,8 @@ def send_ohlc_data_to_api(tickers_object):
                                           minimum_volume_in_usd=tickers_object.minimum_volume_in_usd):
 
             ticker = symbol.replace("/","_")
-            r = requests.put(f'{TA_API}/historical_data/{ticker}',
+            headers = {'API-KEY': ITF_API_KEY}
+            r = requests.put(f'{ITF_API}/v3/historical_data/{ticker}', headers=headers,
                              json={
                                  'exchange': tickers_object.exchange,
                                  'ticker': symbol_info['symbol'],
@@ -116,5 +117,8 @@ def send_ohlc_data_to_api(tickers_object):
                                  'close_volume': symbol_info['baseVolume'],
                              })
 
-            logger.debug(r.url)
-            logger.debug(r.json())
+            try:
+                logger.debug(r.url)
+                logger.debug(str(r.json()))
+            except:
+                pass
