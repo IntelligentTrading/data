@@ -178,3 +178,7 @@ if LOCAL:
     except:
         logger.error("Could not successfully import local_settings.py. This is necessary if you are running locally. This file should be in version control.")
         raise
+
+
+ITF_API = os.environ.get('ITF_API_HOST', "http://127.0.0.1:8000/api")
+ITF_API_KEY = os.environ.get('ITF_API_KEY', "ABC123")
