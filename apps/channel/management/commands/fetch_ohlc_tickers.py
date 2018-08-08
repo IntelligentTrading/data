@@ -1,26 +1,20 @@
 import json
 import logging
 import time
-import threading
 
+import requests
 import schedule
-
-import ccxt
-
 from django.core.management.base import BaseCommand
 
-from apps.channel.tickers import Tickers, get_usdt_rates_for, to_satoshi_int
 from apps.channel.pubsub_queue import publish_message_to_queue
-
-from settings import EXCHANGE_MARKETS, AWS_SNS_TOPIC_ARN, SNS_PRICES_BATCH_SIZE, ITF_API, ITF_API_KEY
+from apps.channel.tickers import Tickers, get_usdt_rates_for
+from apps.common.utilities.multithreading import start_new_thread
+from settings import EXCHANGE_MARKETS, AWS_SNS_TOPIC_ARN, SNS_PRICES_BATCH_SIZE, ITF_API, ITF_API_KEY, DEBUG
 from settings import TICKERS_MINIMUM_USD_VOLUME
-from settings import SOURCE_CHOICES, COUNTER_CURRENCY_CHOICES, COUNTER_CURRENCIES
-
-
 
 logger = logging.getLogger(__name__)
 
-class Command(BaseCommand):
+class Command(BaseCommand):  # fetch_ohlc_tickers
     help = "Fetch tickers every 1 minute"
 
     def handle(self, *args, **options):
@@ -31,7 +25,8 @@ class Command(BaseCommand):
         #fetch_and_process_all_exchanges(usdt_rates); return # one iteration for debug only
 
         schedule.every(1).minutes.do(fetch_and_process_all_exchanges, usdt_rates)
-        fetch_and_process_all_exchanges(usdt_rates) # and go now too!
+        if DEBUG:
+            fetch_and_process_all_exchanges(usdt_rates) # and go now too!
 
         keep_going = True
         while keep_going:
@@ -47,7 +42,7 @@ class Command(BaseCommand):
 def fetch_and_process_all_exchanges(usdt_rates):
     for exchange in EXCHANGE_MARKETS:
         logger.debug(f'Starting fetch_and_process_one({exchange})')
-        threading.Thread(target=fetch_and_process_one, args=(exchange, usdt_rates)).start()
+        fetch_and_process_one(exchange, usdt_rates)
     logger.info('\n>>> Waiting for next call of fetch_and_process_all_exchanges')
 
 
@@ -55,10 +50,11 @@ def fetch_and_process_one(exchange, usdt_rates):
     tickers = Tickers(exchange=exchange, usdt_rates=usdt_rates, minimum_volume_in_usd=TICKERS_MINIMUM_USD_VOLUME)
     tickers.run()
 
-    send_ohlc_data_to_queue(tickers)
     send_ohlc_data_to_api(tickers)
+    send_ohlc_data_to_queue(tickers)
 
 
+@start_new_thread
 def send_ohlc_data_to_queue(tickers_object, batch_size = SNS_PRICES_BATCH_SIZE):
     message_value = []
     for symbol, symbol_info in tickers_object.tickers.items():
@@ -91,7 +87,7 @@ def send_ohlc_data_to_queue(tickers_object, batch_size = SNS_PRICES_BATCH_SIZE):
         publish_message_to_queue(message=json.dumps(message_value_batch), topic_arn=AWS_SNS_TOPIC_ARN, subject="ohlc_prices")
 
 
-import requests
+@start_new_thread
 def send_ohlc_data_to_api(tickers_object):
     for symbol, symbol_info in tickers_object.tickers.items():
 
