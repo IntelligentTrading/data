@@ -1,5 +1,6 @@
 import logging
-
+import time
+import datetime
 import requests
 from django.core.management.base import BaseCommand
 
@@ -15,33 +16,43 @@ class Command(BaseCommand): # firehose_ohlc_data
     def handle(self, *args, **options):
         logger.info(f'Getting ready to push entire history of ohlc tickers')
 
-        for exchange_data_object in ExchangeData.objects.order_by('timestamp')[0:65000]:
-            tickers_object = Tickers(exchange=exchange_data_object.source)
-            tickers_object.tickers = exchange_data_object.data
+        timestamp = jan_1_2017 = 1483228800
+        today = int(time.time())
+        increment = 86400 # seconds in 1 day
 
-            for symbol, symbol_info in tickers_object.tickers.items():
+        while timestamp < today:
+            timestamp += increment
+            logger.info("Running ... " + datetime.datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S'))
 
-                if not symbol.count('/') == 1: # check format is like "ETH/BTC"
-                    logger.debug(f'Skipping symbol: {symbol}')
-                    continue # skip malformed currency pairs
+            for exchange_data_object in ExchangeData.objects.order_by('timestamp').filter(
+                    timestamp__gt=(timestamp-increment), timestamp__lte=timestamp
+            ):
+                tickers_object = Tickers(exchange=exchange_data_object.source)
+                tickers_object.tickers = exchange_data_object.data
 
-                if not tickers_object._symbol_allowed(symbol_info=symbol_info):
-                    logger.debug(f'Skipping symbol: {symbol}')
-                    continue
+                for symbol, symbol_info in tickers_object.tickers.items():
 
-                ticker = symbol.replace("/","_")
-                headers = {'API-KEY': ITF_API_KEY}
-                r = requests.put(f'{ITF_API}/v3/historical_data/{ticker}', headers=headers,
-                                 json={
-                                     'exchange': tickers_object.exchange,
-                                     'ticker': symbol_info['symbol'],
-                                     'timestamp': int(symbol_info['timestamp'] / 1000),  # milliseconds -> sec
-                                     'open_price': symbol_info['open'],
-                                     'high_price': symbol_info['high'],
-                                     'low_price': symbol_info['low'],
-                                     'close_price': symbol_info['close'],
-                                     'close_volume': symbol_info['baseVolume'],
-                                 })
+                    if not symbol.count('/') == 1: # check format is like "ETH/BTC"
+                        # logger.debug(f'Skipping symbol: {symbol}')
+                        continue # skip malformed currency pairs
 
-                if not "success" in r.json():
-                    logger.debug(str(r.json()))
+                    if not tickers_object._symbol_allowed(symbol_info=symbol_info):
+                        # logger.debug(f'Skipping symbol: {symbol}')
+                        continue
+
+                    ticker = symbol.replace("/","_")
+                    headers = {'API-KEY': ITF_API_KEY}
+                    r = requests.put(f'{ITF_API}/v3/historical_data/{ticker}', headers=headers,
+                                     json={
+                                         'exchange': tickers_object.exchange,
+                                         'ticker': symbol_info['symbol'],
+                                         'timestamp': int(symbol_info['timestamp'] / 1000),  # milliseconds -> sec
+                                         'open_price': symbol_info['open'],
+                                         'high_price': symbol_info['high'],
+                                         'low_price': symbol_info['low'],
+                                         'close_price': symbol_info['close'],
+                                         'close_volume': symbol_info['baseVolume'],
+                                     })
+
+                    if not "success" in r.json():
+                        logger.debug(str(r.json()))
