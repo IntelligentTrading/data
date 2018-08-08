@@ -1,24 +1,16 @@
 import json
 import logging
 import time
-import threading
+
 import requests
 import schedule
-
-import ccxt
-
 from django.core.management.base import BaseCommand
 
-from apps.channel.models import ExchangeData
-from apps.channel.tickers import Tickers, get_usdt_rates_for, to_satoshi_int
 from apps.channel.pubsub_queue import publish_message_to_queue
+from apps.channel.tickers import Tickers, get_usdt_rates_for
 from apps.common.utilities.multithreading import start_new_thread
-
 from settings import EXCHANGE_MARKETS, AWS_SNS_TOPIC_ARN, SNS_PRICES_BATCH_SIZE, ITF_API, ITF_API_KEY, DEBUG
 from settings import TICKERS_MINIMUM_USD_VOLUME
-from settings import SOURCE_CHOICES, COUNTER_CURRENCY_CHOICES, COUNTER_CURRENCIES
-
-
 
 logger = logging.getLogger(__name__)
 
