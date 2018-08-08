@@ -9,17 +9,15 @@ from settings import ITF_API, ITF_API_KEY
 
 logger = logging.getLogger(__name__)
 
-class Command(BaseCommand):
+class Command(BaseCommand): # firehose_ohlc_data
     help = "=== THE FIREHOSE ==="
 
     def handle(self, *args, **options):
         logger.info(f'Getting ready to push entire history of ohlc tickers')
 
-        for exchange_data_object in ExchangeData.objects.order_by('timestamp')[0:2]:
-            logger.debug(f'Skipping symbol: {symbol}')
-            tickers_object = Tickers()
+        for exchange_data_object in ExchangeData.objects.order_by('timestamp').all():
+            tickers_object = Tickers(exchange=exchange_data_object.source)
             tickers_object.tickers = exchange_data_object.data
-            tickers_object.exchange = exchange_data_object.source
 
             for symbol, symbol_info in tickers_object.tickers.items():
 
@@ -44,3 +42,6 @@ class Command(BaseCommand):
                                      'close_price': symbol_info['close'],
                                      'close_volume': symbol_info['baseVolume'],
                                  })
+
+                if not "success" in r.json():
+                    logger.debug(str(r.json()))
