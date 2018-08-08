@@ -22,7 +22,7 @@ from settings import SOURCE_CHOICES, COUNTER_CURRENCY_CHOICES, COUNTER_CURRENCIE
 
 logger = logging.getLogger(__name__)
 
-class Command(BaseCommand):
+class Command(BaseCommand):  # fetch_ohlc_tickers
     help = "Fetch tickers every 1 minute"
 
     def handle(self, *args, **options):
