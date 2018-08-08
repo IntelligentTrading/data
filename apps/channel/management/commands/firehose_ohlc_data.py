@@ -15,7 +15,7 @@ class Command(BaseCommand): # firehose_ohlc_data
     def handle(self, *args, **options):
         logger.info(f'Getting ready to push entire history of ohlc tickers')
 
-        for exchange_data_object in ExchangeData.objects.order_by('timestamp').all():
+        for exchange_data_object in ExchangeData.objects.order_by('timestamp')[0:65000]:
             tickers_object = Tickers(exchange=exchange_data_object.source)
             tickers_object.tickers = exchange_data_object.data
 
