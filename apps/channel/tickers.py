@@ -2,7 +2,7 @@ import logging
 
 import ccxt
 
-
+from settings import COUNTER_CURRENCIES
 
 logger = logging.getLogger(__name__)
 logging.getLogger("ccxt.base.exchange").setLevel(logging.INFO)
@@ -21,7 +21,7 @@ class Tickers:
     def run(self):
         if self.tickers is None:
             self._fetch_from_exchange()
-        self._process_tickers_to_standart_format()
+        self._process_tickers_to_standard_format()
 
     def tickers_has_symbol(self, symbol):
         try:
@@ -40,7 +40,7 @@ class Tickers:
         self.tickers = ccxt_exchange.fetch_tickers()
         return self.tickers
 
-    def _process_tickers_to_standart_format(self):
+    def _process_tickers_to_standard_format(self):
         # * Standart Format
         # symbols_info = [
         #     {   'source': 'poloniex',
@@ -95,7 +95,7 @@ class Tickers:
     def _symbol_allowed(symbol_info, usdt_rates=None, minimum_volume_in_usd=None):
         (transaction_currency, counter_currency) = symbol_info['symbol'].split('/')
 
-        if counter_currency not in ('BTC', 'USDT', 'ETH'):
+        if counter_currency not in COUNTER_CURRENCIES:
             return False
         elif len(transaction_currency) >= 6: # Filter out Bitmark from Poloniex
             return False
@@ -136,5 +136,5 @@ def standard_format_item(source, category, value, symbol_info):
         'category': category, # 'price' or 'volume'
         'symbol': symbol_info['symbol'],
         'value': float(value),
-        'timestamp': symbol_info['timestamp']/1000 # timestamp in miliseconds
+        'timestamp': symbol_info['timestamp']/1000 # timestamp in milliseconds
     }
