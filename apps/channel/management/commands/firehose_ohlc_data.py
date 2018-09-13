@@ -41,6 +41,14 @@ class Command(BaseCommand):  # firehose_ohlc_data
                         # logger.debug(f'Skipping symbol: {symbol}')
                         continue
 
+                    if tickers_object.exchange != "binance":  # ignore other exchanges for now
+                        logger.debug(f'Skipping non-binance symbol: {symbol}')
+                        continue
+
+                    if symbol.endswith("ETH"):  # skip ETH counter currency tickers
+                        logger.debug(f'Skipping ETH symbol: {symbol}')
+                        continue
+
                     ticker = symbol.replace("/", "_")
                     headers = {'API-KEY': ITF_API_KEY}
                     r = requests.put(f'{ITF_API}/v3/historical_data/{ticker}', headers=headers,
