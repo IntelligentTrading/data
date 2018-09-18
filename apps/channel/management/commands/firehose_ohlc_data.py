@@ -12,7 +12,19 @@ logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):  # firehose_ohlc_data
-    help = "=== THE FIREHOSE ==="
+    help = "=== THE FIREHOSE ===" + """
+                                               )
+  ,%,                                     ) _(___[]_
+  %%%,&&&,                     ,%%,      (;`       /\
+  %Y/%&&&&                     %%%%   ___/_____)__/ _\__     ,%%,
+^^^||^&\Y&^^^^^^^^^^^^^^^^^^^^^%Y/%^^/ (_()   (  | /____/\^^^%%%%^^
+  `    || _,..=xxxxxxxxxxxx,    ||   |(' |LI (.)I| | LI ||   %\Y%
+ -=      /L_Y.-#########`,-n-. `    @'---|__||___|_|____||_   ||
+___-=___.--'[========]|L]J: []\ __________@//@___________) )______
+-= _ _ _ |/ _ ''_ " " ||[ -_ 4 |  _  _  _  _  _  _  _  _  _  _  _
+        '-(_)-(_)----'v'-(_)--'
+jgs-----------------------------------------------------------------
+    """
 
     def handle(self, *args, **options):
         logger.info(f'Getting ready to push entire history of ohlc tickers')
