@@ -96,6 +96,11 @@ ___-=___.--'[========]|L]J: []\ __________@//@___________) )______
 jgs-----------------------------------------------------------------
     """
 
+
+    def add_arguments(self, parser):
+        parser.add_argument('days_ago', nargs='+', type=int)
+
+
     def handle(self, *args, **options):
         """
 
@@ -109,7 +114,7 @@ jgs-----------------------------------------------------------------
         timestamp = jan_1_2017 = 1483228800
         today = int(time.time())
         if 'days_ago' in options:
-            timestamp = today - (int(options['days_ago'])*24*3600)
+            timestamp = today - (int(options['days_ago'][0])*24*3600)
         increment = 86400  # seconds in 1 day
 
         while timestamp < today:
