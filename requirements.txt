@@ -1,5 +1,6 @@
+boto==2.45.0
 boto3==1.7.22
-ccxt==1.11.155
+ccxt==1.13.38
 decorator==4.0.10
 dj-database-url==0.4.1
 dj-static==0.0.6
@@ -13,15 +14,13 @@ django-unixtimestampfield==0.3.9
 djangorestframework==3.7.7
 ipython==5.1.0
 jsonfield==1.0.3
-#numpy==1.13.3
-#pandas==0.20.3
-psycopg2==2.7.3
+psycopg2==2.7.5
 pytz==2016.10
 PyYAML==3.12
 requests-oauthlib==0.7.0
-requests==2.18.4
+requests==2.20.1
 schedule==0.4.3
 simplejson==3.11.1
 six==1.11.0
 toolz==0.8.2
-waitress==1.0.1
+waitress==1.0.2

@@ -1,4 +1,18 @@
-# ITT Data-Sources
+# ITF Data-Sources
+
+## Description
+ITF Data app collect price information from cryptocurrency exchanges.
+
+## Commands
+
+* `$ python manage.py fetch_tickers` - fetch price and volume information from exchanges. 
+* `$ python manage.py fetch_ohlc_tickers` - fetch open, high, low, close price and volume information from exchanges.
+
+List of exchanges set in EXCHANGE_MARKETS variable. This commands collect information using [CCXT library](https://github.com/ccxt/ccxt/tree/master/python) and publish this info to sns topic (AWS_SNS_TOPIC_ARN variable).
+Both commands filter out information for unsupported counter currencies (COUNTER_CURRENCIES variable) and info with very low 24hr volume (TICKERS_MINIMUM_USD_VOLUME variable).
+For logging json dump from ccxt saved to the ExchangeData model.
+
+* `$ python manage.py fetch_blockchain_stats` - fetch blockchain info from [blockchain.info](https://api.blockchain.info/stats) and save it to BlockchainStats model. We don't send this info to SNS.
 
 
 ## Environment Setup
@@ -12,8 +26,8 @@
  - [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/install.html)
  - run commands to create virtual env
     ```
-    $ mkvirtualenv --python=/usr/local/bin/python3 ITT`
-    $ workon ITT
+    $ mkvirtualenv --python=/usr/local/bin/python3 ITF`
+    $ workon ITF
     ```
  
 2. Clone and setup Django env
