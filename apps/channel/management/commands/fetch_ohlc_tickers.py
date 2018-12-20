@@ -71,7 +71,7 @@ def send_ohlc_data_to_queue(tickers_object, batch_size = SNS_PRICES_BATCH_SIZE):
             message_value.append({
                 'source': tickers_object.exchange,
                 'symbol': symbol_info['symbol'],
-                'timestamp': symbol_info['timestamp']/1000, # timestamp in miliseconds,
+                'timestamp': symbol_info['timestamp']/1000, # timestamp in milliseconds,
                 'popen': symbol_info['open'],
                 'high': symbol_info['high'],
                 'low': symbol_info['low'],
