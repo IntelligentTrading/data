@@ -79,6 +79,7 @@ allowed_tickers = [
     'POE_BTC',
     'NCASH_BTC'
 ]
+allowed_tickers = ["BTC_USDT"]
 
 
 class Command(BaseCommand):  # firehose_ohlc_data
