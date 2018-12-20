@@ -144,7 +144,8 @@ jgs-----------------------------------------------------------------
                     ticker = symbol.replace("/", "_")
                     if ticker not in allowed_tickers:
                         continue
-                    headers = {'API-KEY': ITF_API_KEY}
+                    headers = {'Authorization': f"Token {ITF_API_KEY}"}
+
                     r = requests.put(f'{ITF_API}/v3/historical_data/{ticker}', headers=headers,
                                      json={
                                          'exchange': tickers_object.exchange,

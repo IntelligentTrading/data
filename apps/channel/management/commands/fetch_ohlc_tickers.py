@@ -108,7 +108,7 @@ def send_ohlc_data_to_api(tickers_object):
                                           minimum_volume_in_usd=tickers_object.minimum_volume_in_usd):
 
             ticker = symbol.replace("/","_")
-            headers = {'API-KEY': ITF_API_KEY}
+            headers = {'Authorization': f"Token {ITF_API_KEY}"}
             r = requests.put(f'{ITF_API}/v3/historical_data/{ticker}', headers=headers,
                              json={
                                  'exchange': tickers_object.exchange,
