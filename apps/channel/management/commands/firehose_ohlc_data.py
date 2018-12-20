@@ -123,7 +123,7 @@ jgs-----------------------------------------------------------------
             logger.info("Running ... " + datetime.datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S'))
 
             for exchange_data_object in ExchangeData.objects.order_by('timestamp').filter(
-                    timestamp__gt=(timestamp - increment), timestamp__lte=timestamp
+                    timestamp__gt=(timestamp - increment), timestamp__lte=timestamp, source="binance"
             ):
                 tickers_object = Tickers(exchange=exchange_data_object.source)
                 tickers_object.tickers = exchange_data_object.data
