@@ -78,6 +78,8 @@ ALLOWED_HOSTS = [
     'localhost',
 ]
 
+ADMIN_ENABLED = False
+
 # APPLICATION DEFINITION
 INSTALLED_APPS = [
     # MAIN APPS

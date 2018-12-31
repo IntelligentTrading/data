@@ -93,7 +93,12 @@ class Tickers:
 
     @staticmethod
     def _symbol_allowed(symbol_info, usdt_rates=None, minimum_volume_in_usd=None):
-        (transaction_currency, counter_currency) = symbol_info['symbol'].split('/')
+
+        try:
+            (transaction_currency, counter_currency) = symbol_info['symbol'].split('/')
+        except Exception as e:
+            logger.warning(str(e))
+            return False
 
         if counter_currency not in COUNTER_CURRENCIES:
             return False
