@@ -13,11 +13,11 @@ logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
-    help = "Polls data from Binance every 1 minute"
+    help = "Polls data from KuCoin every 1 minute"
 
     def handle(self, *args, **options):
-        logger.info("Getting ready to poll Kucoin...")
-        schedule.every(1).minutes.do(poll_latest_poloniex_data)
+        logger.info("Getting ready to poll KuCoin...")
+        schedule.every(1).minutes.do(poll_latest_kucoin_data)
 
         keep_going=True
         while keep_going:
@@ -30,12 +30,12 @@ class Command(BaseCommand):
                 keep_going = False
 
 
-def poll_latest_poloniex_data():
+def poll_latest_kucoin_data():
     try:
         logger.info("polling for Kucoin data...")
         req = get('https://api.kucoin.com/api/v1/market/allTickers')
 
-        poloniex_data_point = ExchangeData.objects.create(
+        kucoin_data_point = ExchangeData.objects.create(
             source=KUCOIN,
             data=req.json(), # the exact json from the request data
             timestamp=time.time() # now
