@@ -66,10 +66,10 @@ def fetch_and_process_one(exchange, usdt_rates):
 
 
 def save_to_db(tickers, exchange):
-    timestamp = tickers[list(tickers)[0]]['timestamp']/1000 # convert from timestamp in miliseconds
+    #timestamp = tickers[list(tickers)[0]]['timestamp']/1000 # convert from timestamp in miliseconds
     ExchangeData.objects.create(
         source=exchange,
         data=tickers, # the exact json from the ccxt
-        timestamp=timestamp,
+        #timestamp=timestamp,
     )
     logger.debug(f">>> Saved to db: {exchange}")
