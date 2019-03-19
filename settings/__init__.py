@@ -129,7 +129,8 @@ LOGIN_REDIRECT_URL = '/'
 
 
 # App setting
-EXCHANGE_MARKETS = ('poloniex', 'binance', 'bittrex', 'kucoin') #, 'bitfinex', 'kucoin') # 'gdax') # gdax API does not allow to fetch all tickers at once with a single call to fetch_tickers() for now
+EXCHANGE_MARKETS = ('binance', 'poloniex', 'bittrex', 'kucoin') # 'gdax') # gdax API does not allow to fetch all tickers at once with a single call to fetch_tickers() for now
+
 TICKERS_MINIMUM_USD_VOLUME = 5000
 SNS_PRICES_BATCH_SIZE = 100 # Number of ohlc prices in one SNS message
 
