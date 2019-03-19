@@ -11,7 +11,6 @@ SOURCE_CHOICES = (
     (KUCOIN, 'kucoin'),
 )
 
-
 class ExchangeData(models.Model):
     source = models.CharField(max_length=128)
     data = JSONField(default="")
