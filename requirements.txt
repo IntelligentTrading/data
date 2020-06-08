@@ -16,7 +16,7 @@ ipython==5.1.0
 jsonfield==1.0.3
 psycopg2-binary==2.7.6.1
 pytz==2016.10
-PyYAML==3.12
+PyYAML==5.1
 requests-oauthlib==0.7.0
 requests==2.20.1
 schedule==0.4.3
