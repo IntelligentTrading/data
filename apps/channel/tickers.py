@@ -107,6 +107,9 @@ class Tickers:
         elif None in (minimum_volume_in_usd, usdt_rates):
             return True
 
+        if symbol_info['quoteVolume'] is None: # /.virtualenvs/../ccxt/bitfinex.py returns None
+            return False
+
         quote_volume_in_usdt = symbol_info['quoteVolume']*usdt_rates[counter_currency]
         #print(f">>>>{symbol_info['symbol']} : qV {symbol_info['quoteVolume']}, USD {quote_volume_in_usdt}")
         if quote_volume_in_usdt <= minimum_volume_in_usd:
@@ -141,5 +144,5 @@ def standard_format_item(source, category, value, symbol_info):
         'category': category, # 'price' or 'volume'
         'symbol': symbol_info['symbol'],
         'value': float(value),
-        'timestamp': symbol_info['timestamp']/1000 # timestamp in milliseconds
+        # 'timestamp': symbol_info['timestamp']//1000 # timestamp in milliseconds
     }
